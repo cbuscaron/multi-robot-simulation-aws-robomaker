@@ -10,7 +10,7 @@ Mucho agradecimiento a [Gabriel Gasca](https://github.com/ggasca-aws) y Cindy Po
 En este taller, se familiarizará con AWS RoboMaker, un servicio que le permite desarrollar, simular e implementar fácilmente aplicaciones de robots inteligentes que se integran con otros servicios de AWS. Esto incluye los servicios de aprendizaje automático de AWS, los servicios de monitoreo y los servicios de análisis que permiten a un robot transmitir datos, navegar, comunicarse, comprender y aprender.
 Hoy, simulará uno y luego varios robots en AWS RoboMaker. En la segunda parte, ejecutará un caso de prueba en simulación utilizando AWS RoboMaker. 
 RoboMaker amplía el marco de software de robótica de código abierto más utilizado, Robot Operating System , o [ROS](http://ros.org).
-Por lo tanto, este taller incluirá referencias a los conceptos y herramientas de ROS. No se requiere experiencia previa en ROS, sin embargo, si desea obtener más información, consulte [ROS Wiki](https://wiki.ros.org/es) .
+Por lo tanto, este taller incluirá referencias a los conceptos y herramientas de ROS. No se requiere experiencia previa en ROS, sin embargo, si desea obtener más información, consulte [ROS Wiki](https://wiki.ros.org/es).
 
 ¿Estás emocionado de construir un robot con AWS? ¡Empecemos!
 
