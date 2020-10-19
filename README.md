@@ -1,9 +1,9 @@
 ![Header](https://github.com/cbuscaron/multi-robot-simulation-aws-robomaker/blob/main/images/header.png)
 
 # Simulación de Varios Robots con AWS RoboMaker
-Este taller es parte de [CCOSS](http://ccoss.org) 2020 usando ROS y Gazebo en AWS RoboMaker
+[Este taller](https://ccoss.org/sessions/w-ros/) es parte de [CCOSS 2020](http://ccoss.org) usando ROS y Gazebo en AWS RoboMaker
 
-Mucho agradecimiento [Gabriel Gaca](https://github.com/ggasca-aws) por contribuir a la traduccion a español.  
+Mucho agradecimiento a [Gabriel Gasca](https://github.com/ggasca-aws) y Cindy Polin por contribuir la traduccion a español.  
 
 # Parte I: Robots de simulación y prueba con AWS RoboMaker
 
@@ -360,10 +360,85 @@ Hemos incluido [la extensión ROS de AWS RoboMaker CloudWatch](https://github.co
 3.	Aquí verá muchas métricas. Utilice el filtro en la parte superior para buscar por su ID de trabajo de simulación o tipo de métricas.
 
 
-## Paso 2: ejecutar una prueba de navegación simple con varios robots
+## Paso 2: Ejecutar una prueba de navegación simple con varios robots
+
+A continuación, lanzaremos una prueba de navegación simple con varios robots usando la misma arquitectura como se describe arriba. Puede agregar robots adicionales agregando a la matriz de robots en los archivos de inicio JSON.
+
+1.	Para configurar los parámetros para nuestra prueba, inicie la prueba en la simulación de RoboMaker, abra **launch_tests_two_robots.json**. Puede actualizar nuevamente los parámetros para modificar el escenario de prueba para cada robot.
+
+```shell
+ cd ~/environment/summit-workshop
+./run.sh launch_tests_two_robots.json
+```
+2.	Siga los mismos pasos que el anterior para observar a los dos robots mientras completan las pruebas. Tenga en cuenta las fallas de prueba, cuando los dos robots se encuentran en el camino del otro o no pueden maniobrar con éxito alrededor de un objeto. Una vez completada, asegúrese de cancelar todas las simulaciones.
+
+3.	A continuación, intente con dos robots más o con diferentes parámetros de variables de entorno para obtener un número de navegaciones exitosas. Nuevamente, para realizar estos cambios, actualice **launch_tests_two_robots.json** y luego inicie las simulaciones nuevamente. Para ejecutar las pruebas con cuatro robots, pruebe esta configuración:
+
+```shell
+cd ~/environment/summit-workshop
+./summit-workshop launch_tests_four_robots.json
+```
+
+4.	En la **consola de RoboMaker**, abra **Simulation Job Batches**. Aquí, verá los tres trabajos adicionales que se ejecutan además del servidor.
+
+**¡Felicidades! Ha completado con éxito el taller. Si está interesado en continuar, aquí hay algunas actividades adicionales.**
 
 ### Actividades opcionales
 
+¿Todo hecho y aún te queda algo de tiempo?
+
+Aquí hay un par de actividades adicionales interesantes para probar. A estas alturas, debe saber cómo ejecutar una prueba de navegación simple y comprender cómo está estructurado el código.
+
+Antes de comenzar con las actividades adicionales a continuación, tome nota del script de compilación incluido. Esto facilitará un poco la ejecución de los comandos colcon build y bundle. Deberá ejecutar estos comandos antes de ejecutar una nueva simulación si realiza algún cambio en el código. Para usar ese script, simplemente ejecute:
+
+```shell
+cd ~/environment/summit-workshop
+./build.sh
+```
+Aquí hay un par de actividades interesantes que podría hacer a continuación:
+
+### Actividad adicional: lanza los robots en un mundo de simulación diferente
+
+Hay muchos mundos de gazebo de código abierto disponibles para la comunidad para ejecutar sus pruebas de robot. Dos interesantes para hoy son [AWS RoboMaker Hospital World](https://github.com/aws-robotics/aws-robomaker-hospital-world) y [AWS RoboMaker Bookstore World](https://github.com/aws-robotics/aws-robomaker-bookstore-world).
+* Clone el mundo que desea usar desde GitHub en el directorio **summit-workshop/simulation_ws/src/deps**.
+
+* Luego, actualice el archivo **robot_fleet_rosbridge.launch** en **Summit-Workshop/simulation_ws/src/robot_fleet** para usar el mundo que acaba de clonar. Busque el bloque de código con el comentario **<!-- Launch the world -->** y reemplace la referencia al mundo del pequeño almacén con el mundo que clonó.
+
+* Vuelva a ejecutar la primera parte de este taller para crear, agrupar y lanzar una nueva simulación con sus cambios.
+
+
+### Actividad adicional: agregue sus propios puntos de referencia a la lista de objetivos de navegación definidos con el mundo de los almacenes pequeños
+
+Para hacer esto, puede agregar algunos puntos de ruta personalizados a los puntos de ruta definidos en el archivo **routes.yaml**.
+
+* Cree una nueva simulación de un solo robot y abra Gazebo y RViz haciendo clic en "Conectar" en **gzclient** y la aplicación de simulación.
+* Mueva el robot estableciendo nuevos objetivos de navegación 2D. Observe en la parte inferior de la pantalla en RViz las coordenadas de posición.
+* Seleccione algunos que sean interesantes para probar varios patrones de navegación en el almacén.
+* Actualice el siguiente archivo con las nuevas posiciones: **summit-workshop/simulation_ws/src/deps/aws-robomaker-small-warehouse-world/route/routes.yaml**.
+* Vuelva a ejecutar la segunda parte de este taller con las nuevas rutas.
+* Bonificación adicional: crea un conjunto de rutas con un nuevo archivo **route.yaml** para un mundo diferente después de completar la actividad de bonificación anterior. Actualice el puntero al archivo **route.yaml** en la línea 20 de **summit-workshop/simulation_ws/src/robot_fleet_test_launcher/launch/run_tests.launch** para apuntar al nuevo archivo que creó.
+
+
 ### Limpiar
+
+1.	Cancele cualquier trabajo de simulación en ejecución desde la página de la consola de simulación de RoboMaker.
+
+2.	Vacíe el balde S3. En la consola de AWS, vaya a **Services>S3**. Debería tener un depósito con **multibotrosbridge-robomakerbasics3bucket-xxxxxxx**. Haga clic en el botón de radio junto al depósito S3 y elija **"Empty"** en el menú superior. Se le pedirá que proporcione el nombre del depósito como confirmación de que desea vaciarlo. Copie y pegue el nombre del depósito en el campo y haga clic en **"Empty"**. Este paso eliminará los paquetes y los archivos de registro que se crearon en el depósito de S3.
+
+3.	Vaya a la consola de **CloudFormation** haciendo clic en **Services>CloudFormation**. Haga clic en el botón de radio junto al stack que se llama **"multibotrosbridge"**. Luego, de las opciones, elija **"Delete"**. Este paso eliminará los recursos de AWS que se crearon como parte del script que ejecutó en el entorno de desarrollo de RoboMaker, incluido el bucket de S3 que vació en el bucket anterior.
+
+4.	Cierre la pestaña IDE del entorno de desarrollo de RoboMaker. Busque la consola de RoboMaker. Haga clic en **"Development Environments"**. Haga clic en el entorno de desarrollo que creó en este taller. En la página siguiente, haga clic en **"Edit"**. Esto lo llevará a otra página; haga clic en **"Delete"** en la parte superior derecha de la página. Se le pedirá que escriba eliminar para confirmar que desea eliminarlo. Escriba Delete y luego haga clic en **"Delete"**.
+
+
+## Proximos pasos
+El taller de hoy se basó en nuestra aplicación de muestra disponible públicamente que puede clonar aquí: 
+https://github.com/aws-samples/multi-robot-fleet-sample-application
+
+Después del laboratorio de hoy, ahora comprenderá cómo iniciar simulaciones en RoboMaker, así como cómo utilizar colcon build y bundle para preparar sus aplicaciones para RoboMaker. Solo hay un paso más: ¡clone el repositorio anterior e intercambie su aplicación de robot!
+
+¡Feliz edificio!
+
+## Problemas conocidos
+Este paquete no realiza la sincronización de la hora, y la actualización de la simulación se sincroniza entre las instancias de gazebo. Los mejores resultados se han visto con pilas de software homogéneas que se ejecutan en las instancias de gazebo.
 
 ![Header](https://github.com/cbuscaron/multi-robot-simulation-aws-robomaker/blob/main/images/footer.png)
