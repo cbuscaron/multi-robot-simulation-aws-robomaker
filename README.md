@@ -3,7 +3,7 @@
 # Simulación de Varios Robots con AWS RoboMaker
 [Este taller](https://ccoss.org/sessions/w-ros/) es parte de [CCOSS 2020](http://ccoss.org) usando ROS y Gazebo en AWS RoboMaker
 
-Mucho agradecimiento a [Gabriel Gasca](https://github.com/ggasca-aws) y Cindy Polin por contribuir la traduccion a español.  
+Mucho agradecimiento a [Gabriel Gasca](https://github.com/ggasca-aws) y Cindy Polin por contribuir a la traduccion a español.  
 
 # Parte I: Robots de simulación y prueba con AWS RoboMaker
 
@@ -13,6 +13,7 @@ RoboMaker amplía el marco de software de robótica de código abierto más util
 Por lo tanto, este taller incluirá referencias a los conceptos y herramientas de ROS. No se requiere experiencia previa en ROS, sin embargo, si desea obtener más información, consulte [ROS Wiki](https://wiki.ros.org/es) .
 
 ¿Estás emocionado de construir un robot con AWS? ¡Empecemos!
+
 **Nota importante: una vez que haya completado todas las actividades, complete la sección de limpieza de la cuenta en la parte inferior de esta página.**
 
 
@@ -265,7 +266,7 @@ Para ver este paquete ROS con más profundidad, puede abrirlo aquí:
         }
     ],
     "server": {
-    ... Same as above
+    "same as above / igual arriba"
 }
 ```
 
@@ -436,7 +437,7 @@ https://github.com/aws-samples/multi-robot-fleet-sample-application
 
 Después del laboratorio de hoy, ahora comprenderá cómo iniciar simulaciones en RoboMaker, así como cómo utilizar colcon build y bundle para preparar sus aplicaciones para RoboMaker. Solo hay un paso más: ¡clone el repositorio anterior e intercambie su aplicación de robot!
 
-¡Feliz edificio!
+¡Feliz Desarollo!
 
 ## Problemas conocidos
 Este paquete no realiza la sincronización de la hora, y la actualización de la simulación se sincroniza entre las instancias de gazebo. Los mejores resultados se han visto con pilas de software homogéneas que se ejecutan en las instancias de gazebo.
