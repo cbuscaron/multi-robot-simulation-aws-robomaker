@@ -31,6 +31,34 @@ Para ejecutar el taller de hoy, necesitará acceso a una cuenta de AWS. Debería
 
 ## Paso 1: Configura tu entorno
 
+1.	Abra una nueva pestaña en la consola de AWS RoboMaker (Services->RoboMaker->right-click->new tab)
+
+2.	Cree un entorno de desarrollo (Development->Development environments->Create environment) y complete lo siguiente:
+* **Name:** taller o algo descriptivo
+* **Pre-installed ROS distribution:** elija ROS Melodic
+* **Instance type:** m5.large
+
+3.	Elija la **VPC (default)** y una de las subredes (us-west-2a, us-west-2b o us-west-2c) para la sección Networking 
+
+4.	Luego haga clic en **Create**
+
+Esto abre la página de detalles del entorno, haga clic en **Open environment**, que abrirá una nueva pestaña del navegador con el IDE de Cloud9. Esto puede tardar unos minutos en completarse, pero cuando se haya completado el proceso de creación, verá algo similar a esto:
+![Figure 4](https://github.com/cbuscaron/multi-robot-simulation-aws-robomaker/blob/main/images/figure4.png)
+
+La **página de bienvenida** proporciona información útil para comenzar, pero por ahora no la usaremos, así que haga clic en la X en la pestaña para cerrar. El IDE se divide en cuatro secciones:
+![Figure 5](https://github.com/cbuscaron/multi-robot-simulation-aws-robomaker/blob/main/images/figure5.png)
+
+* (1) El menú de AWS RoboMaker proporciona acceso rápido a acciones comunes. Se actualiza cuando **roboMakerSettings.json** se modifica el archivo. No haremos ninguna modificación a este archivo en este taller.
+
+* (2) Todos los archivos y carpetas residirán aquí, y se pueden seleccionar y hacer doble clic para abrir en el panel del editor (# 4).
+
+* (3) La sección inferior es un panel ajustable para crear o monitorear operaciones de línea de comando. Los desarrolladores de ROS trabajan en esta área para construir, probar e interactuar con el código local.
+
+* (4) Este es el panel principal del editor.
+
+**¡Felicitaciones, ha creado su entorno de desarrollo RoboMaker!**
+
+
 ## Paso 2: Ejecute un solo robot en la simulación de RoboMaker
 
 ## Paso 3: Lanzar varios robots en una simulación de flota
