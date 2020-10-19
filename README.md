@@ -2,9 +2,10 @@
 
 # Simulación de Varios Robots con AWS RoboMaker
 Este taller es parte de [CCOSS](http://ccoss.org) 2020 usando ROS y Gazebo en AWS RoboMaker
-Muchas gracias @ggasca-aws por la traduccion 
 
-# Robots de simulación y prueba con AWS RoboMaker
+Mucho agradecimiento [Gabriel Gaca](https://github.com/ggasca-aws) por contribuir a la traduccion a español.  
+
+# Parte I: Robots de simulación y prueba con AWS RoboMaker
 
 En este taller, se familiarizará con AWS RoboMaker, un servicio que le permite desarrollar, simular e implementar fácilmente aplicaciones de robots inteligentes que se integran con otros servicios de AWS. Esto incluye los servicios de aprendizaje automático de AWS, los servicios de monitoreo y los servicios de análisis que permiten a un robot transmitir datos, navegar, comunicarse, comprender y aprender.
 Hoy, simulará uno y luego varios robots en AWS RoboMaker. En la segunda parte, ejecutará un caso de prueba en simulación utilizando AWS RoboMaker. 
@@ -20,12 +21,15 @@ Antes de comenzar a aprender sobre el desarrollo de robots, debemos configurar a
 
 Para ejecutar el taller de hoy, necesitará acceso a una cuenta de AWS. Debería haber **recibido un código hash temporal** que se puede utilizar para abrir una cuenta de AWS ya aprovisionada para el taller de hoy.
 1.	Los organizadores del evento le enviarán el código hash a través del chat del seminario web. Copie este código hash e introdúzcalo en el siguiente sitio web: https://dashboard.eventengine.run
+
 ![Figure 1](https://github.com/cbuscaron/multi-robot-simulation-aws-robomaker/blob/main/images/figure1.png)
 
 2.	En la siguiente pantalla, haga clic en el botón  **AWS Console**.
+
 ![Figure 2](https://github.com/cbuscaron/multi-robot-simulation-aws-robomaker/blob/main/images/figure2.png)
 
 3.	Luego, haga clic en el botón **Open Console** en la ventana emergente.
+
 ![Figure 3](https://github.com/cbuscaron/multi-robot-simulation-aws-robomaker/blob/main/images/figure3.png)
 
 4. Continúe con el **Paso 1: Configure su entorno**.
@@ -44,9 +48,11 @@ Para ejecutar el taller de hoy, necesitará acceso a una cuenta de AWS. Debería
 4.	Luego haga clic en **Create**
 
 Esto abre la página de detalles del entorno, haga clic en **Open environment**, que abrirá una nueva pestaña del navegador con el IDE de Cloud9. Esto puede tardar unos minutos en completarse, pero cuando se haya completado el proceso de creación, verá algo similar a esto:
+
 ![Figure 4](https://github.com/cbuscaron/multi-robot-simulation-aws-robomaker/blob/main/images/figure4.png)
 
 La **página de bienvenida** proporciona información útil para comenzar, pero por ahora no la usaremos, así que haga clic en la X en la pestaña para cerrar. El IDE se divide en cuatro secciones:
+
 ![Figure 5](https://github.com/cbuscaron/multi-robot-simulation-aws-robomaker/blob/main/images/figure5.png)
 
 * (1) El menú de AWS RoboMaker proporciona acceso rápido a acciones comunes. Se actualiza cuando **roboMakerSettings.json** se modifica el archivo. No haremos ninguna modificación a este archivo en este taller.
@@ -285,8 +291,74 @@ cd ~/environment/summit-workshop
 **Nota importante: recuerde cancelar las simulaciones como lo hizo anteriormente, antes de invocar run.sh nuevamente.**
 
 # Parte II: Lanzamiento de pruebas basadas en escenarios con AWS RoboMaker
+En esta actividad, ejecutaremos un conjunto de pruebas basadas en escenarios en AWS RoboMaker. Los **escenarios** son conjuntos de parámetros que definen las condiciones del mundo real, los comportamientos de los actores y los resultados esperados. Esto permite a los desarrolladores desacoplar el código de la aplicación de simulación de los parámetros que definen las pruebas que se ejecutarán en la simulación. Este desacoplamiento facilita la colaboración con los ingenieros de control de calidad y estandariza la forma en que los equipos ejecutan las pruebas de regresión. También brinda a los ingenieros de control de calidad la flexibilidad para definir fácilmente una variedad de casos de prueba (con diferentes combinaciones de parámetros) que pueden cubrir más completamente los escenarios de prueba deseados. Ejecutaremos estos escenarios automáticamente a través de una simple llamada a la API utilizando el servicio de simulación de AWS RoboMaker.
 
 ## Paso 1: Ejecute una prueba de objetivo de navegación aleatoria simple
+
+Para lanzar una prueba basada en escenarios en RoboMaker, usaremos un paquete de prueba que ha sido creado previamente para usted. Esta sencilla prueba establecerá aleatoriamente un objetivo de navegación del robot en la simulación. Si el robot llega al destino, **ha pasado la prueba**. Si el robot no llega al destino dentro de un período de tiempo definido, **ha fallado la prueba**.
+
+![Figure 21](https://github.com/cbuscaron/multi-robot-simulation-aws-robomaker/blob/main/images/figure21.png)
+
+Si tienes curiosidad acerca del código, la lógica de la prueba se lleva a cabo aquí: **src/robot_fleet_test_launcher/nodes/navigation_test.** Este archivo incluye código Python que **etiquetará automáticamente** los resultados de las pruebas y **terminará automáticamente** el trabajo de simulación cuando las pruebas estén completas.
+
+Aquí están los fragmentos de código en el archivo que realizan estas acciones.
+
+```python
+    def cancel_job(self):
+        rospy.wait_for_service("/robomaker/job/cancel")
+        requestCancel = rospy.ServiceProxy("/robomaker/job/cancel", Cancel)
+        response = requestCancel()
+        if response.success:
+            self.is_cancelled = True
+            rospy.loginfo("Successfully requested cancel job")
+            self.set_tag(id=self.test_name + "_Time_Elapsed_End", value= str(time.time()).split(".", 1)[0])
+        else:
+            rospy.logerr("Cancel request failed: %s", response.message)
+    
+    def set_tag(self, name, value):
+        rospy.wait_for_service("/robomaker/job/add_tags")
+        requestAddTags = rospy.ServiceProxy("/robomaker/job/add_tags", AddTags)
+        tags = ([Tag(key=name, value=value)])
+        response = requestAddTags(tags)
+        if response.success:
+            rospy.loginfo("Successfully added tags: %s", tags)
+        else:
+            rospy.logerr("Add tags request failed for tags (%s): %s", tags, response.message)
+```
+El **número de goles** y la **duración esperada** se parametrizarán mediante variables de entorno. De esta manera podemos definir y ejecutar de forma fácil y extensible muchos escenarios diferentes. Primero, configuraremos estos parámetros.
+
+1.	Abra **launch_test_single.json**. En este archivo, especificamos el paquete de prueba ROS descrito anteriormente (**robot_fleet_test_launcher**) y el **run_tests.launch** archivo para iniciar las pruebas basadas en escenarios en la simulación. Las siguientes dos variables de entorno adicionales definirán los parámetros para la prueba:
+
+* **NAVIGATION_SUCCESS_COUNT** - El número de objetivos de navegación aleatorios que se deben lograr antes de completar la prueba.
+* **SIM_TIMEOUT_SECONDS** - El tiempo total para completar todos los objetivos de navegación antes de la finalización automática.
+
+2.	Actualice estas variables de entorno con el escenario de prueba que desea ejecutar. Recomendamos que el recuento de éxitos para los objetivos de navegación sea **2** y un tiempo de espera de **1000** segundos para comenzar.
+
+3.	Ejecute el escenario de prueba en AWS RoboMaker.
+
+```shell
+cd ~/environment/summit-workshop
+./run.sh launch_test_single.json
+```
+
+4. Abra **RoboMaker Console** y haga clic en **Trabajos de simulación**. Su trabajo de simulación debe estar en el estado **Preparando** o En **ejecución**. Haga clic y abra su trabajo de simulación. Si se está preparando, espere uno o dos minutos hasta que esté en estado de ejecución.
+
+5.	Abra el cliente **Gazebo** y **RViz** como lo hizo en la sección anterior. Su robot debe moverse activamente hacia un objetivo de navegación.
+
+6.	En la consola de RoboMaker, haga clic en la pestaña **Etiquetas** en RoboMaker. Debería ver una **marca de tiempo de inicio**. Observe esta página mientras su robot se acerca al objetivo de navegación. Cuando termine, verá los resultados de la prueba etiquetados en el trabajo de simulación.
+
+![Figure 22](https://github.com/cbuscaron/multi-robot-simulation-aws-robomaker/blob/main/images/figure22.png)
+
+7.	Para ver los registros de la simulación en ejecución para la depuración, puede conectarse a su simulación en ejecución volviendo al **IDE de RoboMaker Cloud9** haciendo clic en **"Simulation > Connect"**. Los registros deberían aparecer en la terminal. **NOTA: Estos registros son muy detallados.**
+
+### Actividad adicional
+
+Hemos incluido [la extensión ROS de AWS RoboMaker CloudWatch](https://github.com/aws-robotics/cloudwatchlogs-ros1) con esta muestra. Está publicando operaciones robóticas personalizadas y métricas de salud, así como registros personalizados que informan cosas como la distancia de obstáculo más cercana. Para verlos cuando se está ejecutando su simulación:
+
+1.	Abra **AWS CloudWatch Logs** en la consola de AWS.
+2.	Haga clic en **Metrics**. Abra **AWSRoboMakerSimulation** 
+3.	Aquí verá muchas métricas. Utilice el filtro en la parte superior para buscar por su ID de trabajo de simulación o tipo de métricas.
+
 
 ## Paso 2: ejecutar una prueba de navegación simple con varios robots
 
